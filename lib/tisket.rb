@@ -8,6 +8,6 @@ end
 
 $LOAD_PATH << File.dirname(__FILE__)
 
-require 'lib/task'
-require 'lib/manager'
-require 'lib/polling'
+require 'tisket/task'
+require 'tisket/manager'
+require 'tisket/polling'
