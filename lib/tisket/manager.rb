@@ -42,7 +42,7 @@ class Tisket::Manager
 
   def run_one(id)
     puts "running #{id}"
-    spec = specs[id].dup
+    spec = (specs[id].try(:dup) || {})
     task = Object.const_get(
       spec.delete(:_class) || camelize(id)
     ).new(self, id: id, **spec)
