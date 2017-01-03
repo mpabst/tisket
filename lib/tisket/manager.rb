@@ -5,6 +5,7 @@ class Tisket::Manager
   attr_accessor *%i[ backward_deps forward_deps initial_set specs threads ]
 
   def initialize(specs)
+    specs = YAML.load(specs) if specs.is_a?(String)
     specs = convert_specs(specs)
 
     self.backward_deps = {}
