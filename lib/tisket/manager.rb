@@ -1,4 +1,5 @@
 require 'set'
+require 'yaml'
 
 class Tisket::Manager
 
