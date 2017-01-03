@@ -44,7 +44,7 @@ class Tisket::Manager
     puts "running #{id}"
     spec = (specs[id] ? specs[id].dup : {})
     task = Object.const_get(
-      spec.delete(:_class) || camelize(id)
+      spec.delete(:_class) || camelize(id.to_s)
     ).new(self, id: id, **spec)
     th = Thread.new{ task.run }
     th.run
