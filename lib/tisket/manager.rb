@@ -14,7 +14,7 @@ class Tisket::Manager
     self.initial_set = Set.new
 
     specs.each do |id,spec|
-      if (deps = spec.delete(:_requires)) && !deps.empty?
+      if spec && (deps = spec.delete(:_requires)) && !deps.empty?
         deps.each{|d| forward_deps[d] << id }
         backward_deps[id] = deps
       else
