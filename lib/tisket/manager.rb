@@ -3,7 +3,7 @@ require 'yaml'
 
 class Tisket::Manager
 
-  attr_accessor *%i[ backward_deps forward_deps initial_set specs threads ]
+  attr_accessor *%i[ backward_deps forward_deps initial_set tasks threads ]
 
   def initialize(specs)
     specs = YAML.load(specs) if specs.is_a?(String)
@@ -12,17 +12,20 @@ class Tisket::Manager
     self.backward_deps = {}
     self.forward_deps = Hash.new{|h,k| h[k] = Set.new }
     self.initial_set = Set.new
+    self.tasks = {}
 
     specs.each do |id,spec|
-      if spec && (deps = spec.delete(:_requires)) && !deps.empty?
+      if spec && (deps = spec[:_requires]) && !deps.empty?
         deps.each{|d| forward_deps[d] << id }
         backward_deps[id] = deps
       else
         initial_set << id
       end
-    end
 
-    self.specs = specs
+      tasks[id] = Object.const_get(
+        spec[:_class] || camelize(id.to_s)
+      ).new(spec.merge(_id: id, _manager: self))
+    end
   end
 
   def complete(id)
@@ -42,11 +45,7 @@ class Tisket::Manager
 
   def run_one(id)
     puts "running #{id}"
-    spec = (specs[id] ? specs[id].dup : {})
-    task = Object.const_get(
-      spec.delete(:_class) || camelize(id.to_s)
-    ).new(self, id: id, **spec)
-    th = Thread.new{ task.run }
+    th = Thread.new{ tasks[id].run }
     th.run
     th
   end

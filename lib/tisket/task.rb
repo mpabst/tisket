@@ -1,22 +1,25 @@
 class Tisket::Task
 
-  def self.attr_names
-    %i[ id manager ]
-  end
-
   def self.defaults
     { }
   end
 
-  def initialize(manager = nil, **kwargs)
-    self.class.attr_names.each do |a|
-      instance_variable_set("@#{a}", kwargs[a] || self.class.defaults[a])
+  attr_accessor :_spec
+
+  def initialize(_spec = {})
+    self._spec = _spec
+  end
+
+  def method_missing(name, *args, &block)
+    if _spec.has_key?(name) && args.empty?
+      _spec[name] || self.class.defaults[name]
+    else
+      super
     end
-    @manager = manager
   end
 
   def run
     yield
-    @manager.complete(@id) if @manager
+    _manager.complete(id) if _manager
   end
 end
